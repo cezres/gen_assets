@@ -10,8 +10,7 @@ import 'assets_generator.dart';
 const String version = '0.0.1';
 
 void generateAssets() {
-  // final directory = Directory.current;
-  final directory = Directory('/Users/cezres/Documents/GitHub/gen_assets');
+  final directory = Directory.current;
 
   /// configs
   final configsPath = join(directory.path, 'gen_assets.yaml');
