@@ -1,7 +1,7 @@
 # gen_assets [WIP]
 
 
-- [ ] [根据资源文件目录生成对应的 Dart 代码](#根据资源文件目录生成对应的-dart-代码)
+- [x] [根据资源文件目录生成对应的 Dart 代码](#根据资源文件目录生成对应的-dart-代码)
 - [ ] [分析项目中未引用的资源文件](#分析项目中未引用的资源文件)
 - [ ] [支持云存储部分低频或大型资源文件以减小包体积](#支持云存储部分低频或大型资源文件以减小包体积)
 
@@ -20,7 +20,7 @@ gen_assets:
 ```yml
 # 工具配置示例
 input_dir: assets
-output_dir: bin
+output: output/assets.g.dart
 ```
 
 
@@ -34,6 +34,25 @@ dart run gen_assets dev
 dart run gen_assets unused
 ```
 
+对于以下目录结构的代码
+```
+assets/
+├── images/
+    |── download.png
+    |── refresh.png
+    |── share.png
+|── fonts/
+    |── Roboto-Regular.ttf
+```
+
+[生成的文件](https://github.com/cezres/gen_assets/blob/main/output/assets.g.dart)
+
+生成文件后的使用方式
+```dart
+Assets.images.download.name; // '/assets/images/download.png'
+Assets.images.download.image(); // Image.asset('/assets/images/download.png')
+Assets.fonts.robotoRegular.name; // '/assets/fonts/Roboto-Regular.ttf'
+```
 
 
 ## 一些实现上的初略想法

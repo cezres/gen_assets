@@ -1,2 +1,2 @@
 input_dir: assets
-output_dir: bin
+output: output/assets.g.dart

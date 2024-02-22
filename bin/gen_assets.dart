@@ -11,7 +11,7 @@ const String version = '0.0.1';
 
 void generateAssets() {
   // final directory = Directory.current;
-  final directory = Directory('/Users/cezres/Desktop/gen_assets');
+  final directory = Directory('/Users/cezres/Documents/GitHub/gen_assets');
 
   /// configs
   final configsPath = join(directory.path, 'gen_assets.yaml');
@@ -23,14 +23,14 @@ void generateAssets() {
   final configs = loadYaml(configFile.readAsStringSync());
 
   final input = configs['input_dir'];
-  final output = configs['output_dir'];
+  final output = configs['output'];
   if (input == null || output == null) {
     print('Invalid gen_assets.yaml file.');
     return;
   }
 
   final inputPath = join(directory.path, input);
-  final outputPath = join(directory.path, output, 'assets.g.dart');
+  final outputPath = join(directory.path, output);
 
   final assets = AssetsGenerator.fromPath(inputPath);
   final formatter = DartFormatter();
@@ -66,8 +66,6 @@ void printUsage(ArgParser argParser) {
 }
 
 void main(List<String> arguments) {
-  generateAssets();
-
   final ArgParser argParser = buildParser();
   try {
     final ArgResults results = argParser.parse(arguments);
@@ -91,6 +89,7 @@ void main(List<String> arguments) {
     if (verbose) {
       print('[VERBOSE] All arguments: ${results.arguments}');
     }
+    generateAssets();
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
     print(e.message);

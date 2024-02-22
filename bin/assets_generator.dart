@@ -23,11 +23,15 @@ final class AssetsGenerator {
   }
 
   String generator() {
-    return '''
-    final class ${rootName.upperFirst} {
-      ${rootName.upperFirst}._();
+    String text = rootDirectory.generator('');
+    final types = rootDirectory.types;
+
+    for (var element in types) {
+      text += element.code;
+      text += '\n';
     }
-    ''';
+
+    return text;
   }
 }
 
@@ -84,14 +88,25 @@ class AssetDirectory {
 
   String generator(String baseName) {
     String child = '';
+    String append = '';
+
+    final prefix = baseName.isEmpty ? 'static ' : '';
     for (final AssetDirectory directory in directories) {
-      child += "AssetsFonts get ${directory.name} => AssetsFonts();";
-      child += '\n';
+      child +=
+          "$prefix ${directory.className} get ${directory.name} => const ${directory.className}();\n";
+
+      append += "${directory.generator(baseName + name.upperFirst)}\n";
+    }
+    for (final AssetFile file in files) {
+      child += '$prefix ${file.generator()}\n';
     }
     return '''
-    final class $baseName$name {
-      ImageAsset get logo => ImageAsset('assets/images/logo.png');
+    final class $baseName${name.upperFirst} {
+      const $baseName${name.upperFirst}();
+      $child
     }
+
+    $append
     ''';
   }
 }
@@ -114,16 +129,16 @@ class AssetFile {
   }
 
   String generator() {
-    return "${type.className} get $name => ${type.className}('$path');";
+    return "${type.className} get ${name.formatVariableName} => const ${type.className}('$path');";
   }
 }
 
 AssetType assetTypeFromExtension(String ext) {
   switch (ext) {
-    case 'png':
-    case 'jpg':
-    case 'jpeg':
-    case 'webp':
+    case '.png':
+    case '.jpg':
+    case '.jpeg':
+    case '.webp':
       return AssetType.image;
     default:
       return AssetType.unknown;
@@ -146,8 +161,13 @@ enum AssetType {
   String get code {
     switch (this) {
       case AssetType.image:
+        // extension type ImageAsset(String name) {
         return '''
-        extension type ImageAsset(String name) {
+         final class ImageAsset { 
+          const ImageAsset(this.name);
+
+          final String name;
+
           Widget image({
             double? width,
             double? height,
@@ -165,7 +185,13 @@ enum AssetType {
         }
         ''';
       case AssetType.unknown:
+        // extension type UnknownAsset(String name) {}
         return '''
+        final class UnknownAsset {
+          const UnknownAsset(this.name);
+
+          final String name;
+        }
         ''';
     }
   }
@@ -173,4 +199,16 @@ enum AssetType {
 
 extension UpperFirst on String {
   String get upperFirst => this[0].toUpperCase() + substring(1);
+}
+
+extension LowerFirst on String {
+  String get lowerFirst => this[0].toLowerCase() + substring(1);
+
+  String get formatVariableName {
+    return replaceAll('-', '').lowerFirst;
+  }
+}
+
+String formatVariableName() {
+  return '';
 }
