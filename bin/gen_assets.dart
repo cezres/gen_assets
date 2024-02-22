@@ -3,40 +3,12 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:path/path.dart';
 import 'package:yaml/yaml.dart';
-import 'package:dart_style/dart_style.dart';
 
-import 'assets_generator.dart';
+import 'convert/convert_to_webp.dart';
+import 'convert/list_original_images.dart';
+import 'generator/assets_generator.dart';
 
 const String version = '0.0.1';
-
-void generateAssets() {
-  final directory = Directory.current;
-
-  /// configs
-  final configsPath = join(directory.path, 'gen_assets.yaml');
-  final configFile = File(configsPath);
-  if (!configFile.existsSync()) {
-    print('No gen_assets.yaml file found in the current directory.');
-    return;
-  }
-  final configs = loadYaml(configFile.readAsStringSync());
-
-  final input = configs['input_dir'];
-  final output = configs['output'];
-  if (input == null || output == null) {
-    print('Invalid gen_assets.yaml file.');
-    return;
-  }
-
-  final inputPath = join(directory.path, input);
-  final outputPath = join(directory.path, output);
-
-  final assets = AssetsGenerator.fromPath(inputPath);
-  final formatter = DartFormatter();
-  final outputString = formatter.format(assets.generator());
-
-  File(outputPath).writeAsStringSync(outputString);
-}
 
 ArgParser buildParser() {
   return ArgParser()
@@ -56,6 +28,18 @@ ArgParser buildParser() {
       'version',
       negatable: false,
       help: 'Print the tool version.',
+    )
+    ..addFlag(
+      'cwebp',
+      abbr: 'c',
+      negatable: false,
+      help: 'Convert images to webp format.',
+    )
+    ..addFlag(
+      'list_cwebp_original',
+      abbr: 'l',
+      negatable: false,
+      help: 'List all original images converted to webp.',
     );
 }
 
@@ -64,7 +48,7 @@ void printUsage(ArgParser argParser) {
   print(argParser.usage);
 }
 
-void main(List<String> arguments) {
+void main(List<String> arguments) async {
   final ArgParser argParser = buildParser();
   try {
     final ArgResults results = argParser.parse(arguments);
@@ -83,16 +67,34 @@ void main(List<String> arguments) {
       verbose = true;
     }
 
-    // Act on the arguments provided.
-    print('Positional arguments: ${results.rest}');
     if (verbose) {
       print('[VERBOSE] All arguments: ${results.arguments}');
     }
-    generateAssets();
+
+    final yaml = loadGenAssetsYaml();
+    // listOriginalImages(yaml);
+
+    if (results.wasParsed('cwebp')) {
+      converToWebp(yaml);
+    } else if (results.wasParsed('list_cwebp_original')) {
+      listOriginalImages(yaml);
+    } else {
+      generateAssets(yaml);
+    }
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
     print(e.message);
     print('');
     printUsage(argParser);
   }
+}
+
+dynamic loadGenAssetsYaml() {
+  final configsPath = join(Directory.current.path, 'gen_assets.yaml');
+  final configFile = File(configsPath);
+  if (!configFile.existsSync()) {
+    print('No gen_assets.yaml file found in the current directory.');
+    return;
+  }
+  return loadYaml(configFile.readAsStringSync());
 }

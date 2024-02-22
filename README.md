@@ -5,7 +5,8 @@
 - [ ] [分析项目中未引用的资源文件](#分析项目中未引用的资源文件)
 - [ ] [支持云存储部分低频或大型资源文件以减小包体积](#支持云存储部分低频或大型资源文件以减小包体积)
 - [ ] 检查重复文件
-- [ ] 批量压缩文件
+- [ ] 压缩文件
+    - [x] [压缩图片文件至 WebP 格式](#压缩图片文件)
 
 
 ## 如何使用
@@ -25,15 +26,12 @@ input_dir: assets
 output: output/assets.g.dart
 ```
 
+#### 生成代码
 
 运行
 ```bash
 # 根据配置生成代码文件
-dart run gen_assets
-# 生成开发环境的代码文件 [WIP]
-dart run gen_assets dev
-# 输出未使用文件的列表 [WIP]
-dart run gen_assets unused
+$ dart run gen_assets
 ```
 
 对于以下目录结构的代码
@@ -54,6 +52,39 @@ assets/
 Assets.images.download.name; // '/assets/images/download.png'
 Assets.images.download.image(); // Image.asset('/assets/images/download.png')
 Assets.fonts.robotoRegular.name; // '/assets/fonts/Roboto-Regular.ttf'
+```
+
+
+#### 压缩图片文件
+
+需要先确保本机安装了 WebP。[下载并安装 WebP](https://developers.google.com/speed/webp/download?hl=zh-cn)
+
+```bash
+# 压缩图片，并保留原始文件，完成后输出减少的体积
+$ dart run gen_assets --cwebp
+
+# 输出
+Building package executable... 
+Built gen_assets:gen_assets.
+1/3 /assets/images/download.png --> /assets/images/download.webp
+2/3 /assets/images/share.png --> /assets/images/share.webp
+3/3 /assets/images/refresh.png --> /assets/images/refresh.webp
+Original size: 3.96875 KB
+New size: 1.64453125 KB
+Compression ratio: 41.4370%
+
+# 列出已被压缩的原始文件，输入 'Y' 确认后删除
+$ dart run gen_assets --list_cwebp_original
+
+# 输出
+Building package executable... 
+Built gen_assets:gen_assets.
+1. /assets/images/refresh.png
+2. /assets/images/download.png
+3. /assets/images/share.png
+Enter 'Y' to delete all original images:
+Y
+All original images deleted.
 ```
 
 
