@@ -38,7 +38,7 @@ dart run gen_assets unused
 
 ## 一些实现上的初略想法
 
-使用 Dart CLI 工程实现，在目标工程的 dev_dependencies 添加此包然后通过 `dart run gen_assets` 执行。
+使用 Dart CLI 工程实现，在目标工程的 dev_dependencies 添加此包然后通过 `dart run gen_assets` 执行，根据运行时的路径查找配置文件后执行后续逻辑。
 
 
 ### 根据资源文件目录生成对应的 Dart 代码
