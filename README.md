@@ -26,7 +26,7 @@ input_dir: assets
 output: output/assets.g.dart
 ```
 
-#### 生成代码
+### 生成代码
 
 运行
 ```bash
@@ -55,7 +55,7 @@ Assets.fonts.robotoRegular.name; // '/assets/fonts/Roboto-Regular.ttf'
 ```
 
 
-#### 压缩图片文件
+### 压缩图片文件
 
 需要先确保本机安装了 Google WebP [下载并安装 WebP](https://developers.google.com/speed/webp/download?hl=zh-cn)。
 
