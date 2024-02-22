@@ -57,7 +57,7 @@ Assets.fonts.robotoRegular.name; // '/assets/fonts/Roboto-Regular.ttf'
 
 #### 压缩图片文件
 
-需要先确保本机安装了 Google WebP。[下载并安装 WebP](https://developers.google.com/speed/webp/download?hl=zh-cn)
+需要先确保本机安装了 Google WebP [下载并安装 WebP](https://developers.google.com/speed/webp/download?hl=zh-cn)。
 
 ```bash
 # 压缩图片，并保留原始文件，完成后输出减少的体积
