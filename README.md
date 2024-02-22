@@ -59,12 +59,12 @@ Assets.fonts.robotoRegular.name; // '/assets/fonts/Roboto-Regular.ttf'
 
 需要先确保本机安装了 Google WebP [下载并安装 WebP](https://developers.google.com/speed/webp/download?hl=zh-cn)。
 
-压缩图片，并保留原始文件，完成后输出减少的体积
+**压缩图片，并保留原始文件，完成后输出减少的体积**
 ```bash
 dart run gen_assets --cwebp
 ```
 
-输出:
+**输出:**
 ```shell
 Building package executable... 
 Built gen_assets:gen_assets.
@@ -76,12 +76,12 @@ New size: 1.645 KB
 Compression ratio: 41.4370%
 ```
 
-列出已被压缩的原始文件，输入 'Y' 确认后删除
+**列出已被压缩的原始文件，输入 'Y' 确认后删除**
 ```shell
 dart run gen_assets --list_cwebp_original
 ```
 
-输出:
+**输出:**
 ```shell
 Building package executable... 
 Built gen_assets:gen_assets.
