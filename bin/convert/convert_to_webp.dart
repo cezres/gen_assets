@@ -34,8 +34,8 @@ void converToWebp(dynamic yaml) async {
       .map((e) => File(e.path).lengthSync())
       .fold(0, (previousValue, element) => previousValue + element);
 
-  print('Original size: ${originalSize / 1024} KB');
-  print('New size: ${newSize / 1024} KB');
+  print('Original size: ${(originalSize / 1024).toStringAsFixed(3)} KB');
+  print('New size: ${(newSize / 1024).toStringAsFixed(3)} KB');
   print(
       'Compression ratio: ${(newSize / originalSize * 100).toStringAsFixed(4)}%');
 }

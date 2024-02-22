@@ -7,4 +7,5 @@ output: output/assets.g.dart
 # 工程代码根目录，用于识别未使用的资源文件
 source_dir: bin
 
+# 需要转换到webp格式的图片文件后缀
 convert_to_webp: [png]
