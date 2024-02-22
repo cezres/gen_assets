@@ -6,13 +6,20 @@ final class Assets {
 
 final class AssetsImages {
   const AssetsImages();
+
+  /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/download.png)
   ImageAsset get download => const ImageAsset('/assets/images/download.png');
+
+  /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/share.png)
   ImageAsset get share => const ImageAsset('/assets/images/share.png');
+
+  /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/refresh.png)
   ImageAsset get refresh => const ImageAsset('/assets/images/refresh.png');
 }
 
 final class AssetsFonts {
   const AssetsFonts();
+
   UnknownAsset get robotoRegular =>
       const UnknownAsset('/assets/fonts/Roboto-Regular.ttf');
 }

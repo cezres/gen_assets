@@ -27,7 +27,7 @@ final class AssetsGenerator {
     final types = rootDirectory.types;
 
     for (var element in types) {
-      text += element.code;
+      text += element.generator;
       text += '\n';
     }
 
@@ -112,9 +112,15 @@ class AssetDirectory {
 }
 
 class AssetFile {
-  AssetFile({required this.path, required this.name, required this.type});
+  AssetFile({
+    required this.path,
+    required this.relativePath,
+    required this.name,
+    required this.type,
+  });
 
   final String path;
+  final String relativePath;
   final String name;
   final AssetType type;
 
@@ -122,14 +128,19 @@ class AssetFile {
     final String name = basenameWithoutExtension(path);
     final String relativePath = path.replaceFirst(rootPath, '');
     return AssetFile(
-      path: relativePath,
+      path: path,
+      relativePath: relativePath,
       name: name,
       type: assetTypeFromExtension(extension(path)),
     );
   }
 
   String generator() {
-    return "${type.className} get ${name.formatVariableName} => const ${type.className}('$path');";
+    return """
+    ${type.generatorComment(this)}
+    ${type.className} get ${name.formatVariableName} => const ${type.className}('$relativePath');
+    """;
+    // return "";
   }
 }
 
@@ -158,7 +169,16 @@ enum AssetType {
     }
   }
 
-  String get code {
+  String generatorComment(AssetFile file) {
+    switch (this) {
+      case AssetType.image:
+        return '/// ![](${file.path})';
+      case AssetType.unknown:
+        return '';
+    }
+  }
+
+  String get generator {
     switch (this) {
       case AssetType.image:
         // extension type ImageAsset(String name) {
