@@ -28,9 +28,9 @@ output: output/assets.g.dart
 ```bash
 # 根据配置生成代码文件
 dart run gen_assets
-# 生成开发环境的代码文件
+# 生成开发环境的代码文件 [WIP]
 dart run gen_assets dev
-# 输出未使用文件的列表
+# 输出未使用文件的列表 [WIP]
 dart run gen_assets unused
 ```
 
