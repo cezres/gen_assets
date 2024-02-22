@@ -62,7 +62,7 @@ Assets.fonts.robotoRegular.name; // '/assets/fonts/Roboto-Regular.ttf'
 
 ### 根据资源文件目录生成对应的 Dart 代码
 
-- [ ] 生成代码的调用结构与实际目录结构一致
+- [x] 生成代码的调用结构与实际目录结构一致
 - [ ] 支持更多的文件类型，以及其相应的便捷使用函数
     - [ ] 可以考虑 Dart 3.3 的 `extension type` 减少类型包装的开销。
 - [ ] 支持排除文件，目录路径、文件路径、文件类型
