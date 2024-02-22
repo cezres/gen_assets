@@ -1,2 +1,8 @@
+# 资源文件根目录
 input_dir: assets
+
+# 生成的代码路径
 output: output/assets.g.dart
+
+# 工程代码根目录，用于识别未使用的资源文件
+source_dir: bin
