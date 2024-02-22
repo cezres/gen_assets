@@ -1,1 +1,1 @@
-# gen_assets
+A sample command-line application providing basic argument parsing with an entrypoint in `bin/`.
