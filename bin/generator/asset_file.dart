@@ -30,7 +30,7 @@ class AssetFile {
   String generator() {
     return """
     ${type.generatorComment(this)}
-    ${type.className} get ${name.formatVariableName} => ${type.generatorConstruct(this)};
+    ${type.className} get ${name.formatName.lowerFirst} => ${type.generatorConstruct(this)};
     """;
   }
 }

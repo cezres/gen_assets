@@ -10,7 +10,7 @@
 - [ ] 压缩文件
     - [x] [压缩图片文件至 WebP 格式](#压缩图片文件)
 - [ ] CI/CD
-- [ ] [支持云存储部分低频或大型资源文件以减小包体积](#支持云存储部分低频或大型资源文件以减小包体积)
+- [ ] [云存储部分低频或大型资源文件以减小包体积](#云存储部分低频或大型资源文件以减小包体积)
 
 
 ## 如何使用
@@ -81,6 +81,8 @@ dart run gen_assets list-duplicates
 ```shell
 Duplicate Files:
 [/assets/images/download.png, /assets/images/download_1.png]
+Duplicate File Count: 1
+Total Extra Size: 0.0008 MB
 ```
 
 ### 压缩图片文件
@@ -148,28 +150,29 @@ All original images deleted.
 - [ ] 对于支持 BackgroundIsolateBinaryMessenger 的版本，添加一些额外的平台实现以支持完全在 Isolate 中加载App包内的大型资源文件。 
     - [ ] rootBundle 也就是 PlatformAssetBundle，看起来是通过发送`flutter/assets`消息由原生平台加载，读取过程应该不必优化至 Isolate，需要实测对比。
 
+### 多 packages 工程的资源管理？
 
 ### CI/CD?
 
-例如使用 GitHub Actions，在指定分支的资源文件目录和`gen_assets.yaml`发生变更时触发，执行命令并自动提交[Commit 或 PR]。
+例如使用 GitHub Actions，在指定分支的资源文件目录和`gen_assets.yaml`发生变更时触发，执行命令并检查或自动提交[Commit 或 PR]。
 
-### 支持云存储部分低频或大型资源文件以减小包体积
+### 云存储部分低频或大型资源文件以减小包体积
 
 - [ ] 业务层调用如何兼容本地资源和网络资源？
     - [ ] 例如图片文件添加构建 Weiget 函数，网络类型资源和本地类型资源接口名称和参数一致，这样业务层无需对来源类型做额外处理
-- [ ] 如何分析哪些资源适合云存储?
+- [ ] 如何配置需要云存储的文件
     - 在配置文件中指定
-    - 根据统计数据和配置文件中的限制输出匹配的资源文件列表
+    - 根据统计数据和配置文件中的限制自动生成匹配的资源文件列表
         - 在开发环境使用不同的配置生成代码，在资源被引用时记录相关参数.
         - 适合云存储资源文件的相关数据指标
             - 首次引用时距离应用启动的时间
             - 资源文件大小
             - 引用的总持续时间
-                - 开发环境版本的代码使用自定义的 ImageProvider 能获取到被监听或取消监听
+                - 开发环境版本的代码使用自定义的 ImageProvider 获取到被监听或取消监听
             - 记录应用程序退出时间
     - 根据云存储资源文件的配置表
         - 配置 OSS Key ，使用命令批量上传云存储资源文件
-        - 所有文件全量放在项目目录下，但通过工具命令自动维护 pubspec.yaml 的 assets 依赖
+        - 所有文件全量放在项目目录下，但通过工具自动维护 pubspec.yaml 的 assets 依赖
 - [ ] 不同版本云存储资源文件的管理？
     - 读取运行目录下的 pubspec.yaml 中的 version 作为存储时区分版本的上级目录
 - [ ] 预加载网络资源的组件

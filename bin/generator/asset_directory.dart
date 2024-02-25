@@ -35,8 +35,8 @@ class AssetDirectory {
     String rootPath,
     String baseClassName,
   ) {
-    final String name = basename(path);
-    final String className = baseClassName + name.formatClassName;
+    final String name = basename(path).formatName;
+    final String className = baseClassName + name.upperFirst;
     final List<FileSystemEntity> entities = Directory(path).listSync();
     final List<AssetDirectory> directories = <AssetDirectory>[];
     final List<AssetFile> files = <AssetFile>[];
@@ -64,7 +64,7 @@ class AssetDirectory {
     final prefix = baseName.isEmpty ? 'static ' : '';
     for (final AssetDirectory directory in directories) {
       child +=
-          "$prefix ${directory.className} get ${directory.name} => const ${directory.className}();\n";
+          "$prefix ${directory.className} get ${directory.name} => const ${directory.className}();\n\n";
 
       append += "${directory.generator(baseName + name.upperFirst)}\n";
     }

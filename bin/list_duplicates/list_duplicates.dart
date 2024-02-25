@@ -8,27 +8,42 @@ import '../utils/directory_utils.dart';
 
 final class DuplicateFileDetector {
   Future<void> listDuplicates() async {
-    final md5 = await calculateFileMD5();
+    // FileRelativePath -> MD5Info
+    final relativePathOfMd5Info = await _calculateFileMD5();
 
-    final duplicates =
-        <String, List<String>>{}; // MD5 -> List<FileRelativePath>
-    for (var element in md5.entries) {
+    // MD5 -> List<FileRelativePath>
+    final md5OfRelativePathList = <String, List<String>>{};
+    for (var element in relativePathOfMd5Info.entries) {
       final path = element.key;
       final cache = element.value;
       final md5 = cache['md5'];
-      final list = duplicates[md5];
+      final list = md5OfRelativePathList[md5];
       if (list != null) {
         list.add(path);
       } else {
-        duplicates[md5] = [path];
+        md5OfRelativePathList[md5] = [path];
       }
     }
 
+    final duplicates = md5OfRelativePathList.values
+        .where((element) => element.length > 1)
+        .toList();
+
     print('Duplicate Files:');
-    duplicates.values.where((element) => element.length > 1).forEach(print);
+    duplicates.forEach(print);
+
+    print('Duplicate File Count: ${duplicates.length}');
+
+    final totalSize = duplicates.fold<int>(
+        0,
+        (previousValue, element) => previousValue +
+            (element.length - 1) *
+                relativePathOfMd5Info[element.first]!['size'] as int);
+    print(
+        'Total Extra Size: ${(totalSize / 1024 / 1024).toStringAsFixed(4)} MB');
   }
 
-  Future<Map<String, Map<String, dynamic>>> calculateFileMD5() async {
+  Future<Map<String, Map<String, dynamic>>> _calculateFileMD5() async {
     final caches = GenAssetsLock.loadMD5Caches();
     final newMd5 = <String, Map<String, dynamic>>{};
 

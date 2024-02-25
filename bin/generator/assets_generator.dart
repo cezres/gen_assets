@@ -19,6 +19,11 @@ void generateAssets(dynamic yaml) {
   final assets = AssetsGenerator.fromPath(inputPath);
   final formatter = DartFormatter();
   final outputString = formatter.format(assets.generator());
+  final outputFile = File(outputPath);
+
+  if (!outputFile.parent.existsSync()) {
+    outputFile.parent.createSync(recursive: true);
+  }
 
   File(outputPath).writeAsStringSync(outputString);
 }
@@ -63,15 +68,13 @@ extension UpperFirst on String {
 extension LowerFirst on String {
   String get lowerFirst => this[0].toLowerCase() + substring(1);
 
-  String get formatVariableName {
-    return replaceAll('-', '').lowerFirst;
-  }
-
-  String get formatClassName {
-    return replaceAll(r'[^a-zA-Z0-9_]', '_').upperFirst;
+  String get formatName {
+    var string = this;
+    if (isNotEmpty && _isDigit(this[0])) {
+      string = '_$string';
+    }
+    return string.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
   }
 }
 
-String formatVariableName() {
-  return '';
-}
+bool _isDigit(String s) => (s.codeUnitAt(0) ^ 0x30) <= 9;
