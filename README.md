@@ -3,10 +3,7 @@
 
 - [x] [根据资源文件目录生成对应的 Dart 代码](#生成代码)
     - [ ] 缓存策略，无、弱引用、5分钟、30分钟、永久
-    - [ ] 根据配置文件中的限制，对部分类型的大型文件的加载将使用 compute，
-        - [ ] 对于受 rootBundle 限制的大型资源文件例如大JSON文件，将解码与对象实例化的步骤放在 Isoalte，使用TransferableTypedData和Isolate.exit 不会产生额外的复制性能损耗，但有 Isolate 的创建损耗。
-        - [ ] 对于不受 rootBundle 限制的云存储资源文件使用 compute 加载。
-        - [ ] 对于支持 BackgroundIsolateBinaryMessenger 的版本，添加一些额外的平台实现以支持完全在 Isolate 中加载App包内的大型资源文件。 
+    - [ ] 根据配置文件中的限制，对部分类型的大型文件例如大JSON文件的解码及实例化使用 compute
 - [ ] [分析项目中未引用的资源文件](#分析项目中未引用的资源文件)
 - [x] [检查重复文件](#检查重复文件)
 - [ ] 相似文件
@@ -130,6 +127,11 @@ All original images deleted.
 
 - [x] 生成代码的调用结构与实际目录结构一致
 - [ ] 支持更多的文件类型，以及其相应的便捷使用函数
+    - [x] png、jpeg、webp、...
+    - [ ] svg
+    - [ ] json
+    - [ ] ini
+    - [x] 其它，路径、二进制数据、字符串
     - [ ] 可以考虑 Dart 3.3 的 `extension type` 减少类型包装的开销。
 - [ ] 支持排除文件，目录路径、文件路径、文件类型
 
@@ -137,6 +139,15 @@ All original images deleted.
 ### 分析项目中未引用的资源文件
 
 由于使用了自动生成的代码引用资源文件，从代码文件中分析类和函数调用，从特征上来说比以前的字符串更容易精准识别。
+
+### 根据配置文件中的限制，对部分类型的大型文件的加载将使用 compute
+
+- [ ] 对于受 rootBundle 限制无法在 Isolate 读取的大型资源文件如大JSON文件，将解码与对象实例化的步骤放在 Isoalte，使用TransferableTypedData和Isolate.exit 不会产生额外的复制性能损耗，但有 Isolate 的创建损耗。
+    - [ ] 复用 Isolate 的话也有回传复制的损耗，考虑合并短时间内的任务。
+- [ ] 对于不受 rootBundle 限制的云存储资源文件使用 compute 加载。
+- [ ] 对于支持 BackgroundIsolateBinaryMessenger 的版本，添加一些额外的平台实现以支持完全在 Isolate 中加载App包内的大型资源文件。 
+    - [ ] rootBundle 也就是 PlatformAssetBundle，看起来是通过发送`flutter/assets`消息由原生平台加载，读取过程应该不必优化至 Isolate，需要实测对比。
+
 
 ### CI/CD?
 
