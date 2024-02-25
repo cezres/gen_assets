@@ -135,8 +135,10 @@ dart run gen_assets cjson
 
 **输出:**
 ```shell
-18960 --> 4524 -- /assets/lottie/living_push.json
-Total reduction of 0.0138 MB
+162 --> 98 -- /assets/json/test1.json
+15385 --> 4004 -- /assets/lottie/test1.json
+18960 --> 4524 -- /assets/lottie/test2.json
+Total reduction of 0.0247 MB
 ```
 
 ## 一些实现上的初略想法
