@@ -23,7 +23,7 @@ AssetType assetTypeFromFilePath(String path) {
           return AssetType.lottie;
         }
       }
-      return AssetType.unknown;
+      return AssetType.json;
     default:
       return AssetType.unknown;
   }
@@ -33,6 +33,7 @@ enum AssetType {
   image,
   font,
   lottie,
+  json,
   unknown;
 
   String get className {
@@ -43,6 +44,8 @@ enum AssetType {
         return 'FontAsset';
       case AssetType.lottie:
         return 'LottieAsset';
+      case AssetType.json:
+        return 'JsonAsset';
       case AssetType.unknown:
         return 'UnknownAsset';
     }
@@ -56,6 +59,8 @@ enum AssetType {
         return ['package:lottie/lottie.dart'];
       case AssetType.font:
         return [];
+      case AssetType.json:
+        return ['dart:convert', 'dart:isolate'];
       case AssetType.unknown:
         return ['package:flutter/services.dart'];
     }
@@ -68,6 +73,7 @@ enum AssetType {
       case AssetType.unknown:
       case AssetType.font:
       case AssetType.lottie:
+      case AssetType.json:
         return '';
     }
   }
@@ -81,6 +87,8 @@ enum AssetType {
       case AssetType.font:
         final basename = basenameWithoutExtension(file.relativePath);
         return 'const $className(\'$basename\')';
+      case AssetType.json:
+        return 'const $className(\'${file.relativePath}\', true)';
     }
   }
 
@@ -113,7 +121,7 @@ enum AssetType {
         return '''
         final class FontAsset {
           const FontAsset(this.name);
-          
+
           final String name;
         }
         ''';
@@ -186,6 +194,49 @@ enum AssetType {
 
           Future<String> loadString({bool cache = false}) =>
               rootBundle.loadString(path, cache: cache);
+        }
+        ''';
+      case AssetType.json:
+        return '''
+        final class JsonAsset extends UnknownAsset {
+          const JsonAsset(super.path, this.backgroud);
+
+          final bool backgroud;
+
+          Future<Map<String, dynamic>> json() async {
+            final data = await load();
+            if (backgroud) {
+              return compute(
+                (message) {
+                  return _parseToJson(message.materialize().asUint8List());
+                },
+                TransferableTypedData.fromList([data.buffer.asUint8List()]),
+              );
+            } else {
+              return _parseToJson(data.buffer.asUint8List());
+            }
+          }
+
+          Future<T> parse<T>(
+              Future<T> Function(Map<String, dynamic> json) parser) async {
+            final data = await load();
+            if (backgroud) {
+              return compute(
+                (message) {
+                  final bytes = message.materialize().asUint8List();
+                  return parser(_parseToJson(bytes));
+                },
+                TransferableTypedData.fromList([data.buffer.asUint8List()]),
+              );
+            } else {
+              return parser(_parseToJson(data.buffer.asUint8List()));
+            }
+          }
+
+          static Map<String, dynamic> _parseToJson(Uint8List bytes) {
+            final string = utf8.decode(bytes);
+            return jsonDecode(string);
+          }
         }
         ''';
     }

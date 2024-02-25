@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:isolate';
 import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
 
@@ -7,6 +9,8 @@ final class Assets {
   static AssetsFonts get fonts => const AssetsFonts();
 
   static AssetsImages get images => const AssetsImages();
+
+  static AssetsJson get json => const AssetsJson();
 
   static AssetsLottie get lottie => const AssetsLottie();
 }
@@ -33,14 +37,18 @@ final class AssetsImages {
   ImageAsset get share => const ImageAsset('assets/images/share.png');
 }
 
+final class AssetsJson {
+  const AssetsJson();
+
+  JsonAsset get test1 => const JsonAsset('assets/json/test1.json', true);
+}
+
 final class AssetsLottie {
   const AssetsLottie();
 
-  LottieAsset get livingPush =>
-      const LottieAsset('assets/lottie/living_push.json');
+  LottieAsset get test1 => const LottieAsset('assets/lottie/test1.json');
 
-  LottieAsset get videoLoading =>
-      const LottieAsset('assets/lottie/video_loading.json');
+  LottieAsset get test2 => const LottieAsset('assets/lottie/test2.json');
 }
 
 final class FontAsset {
@@ -67,6 +75,47 @@ final class ImageAsset {
       fit: fit,
       color: color,
     );
+  }
+}
+
+final class JsonAsset extends UnknownAsset {
+  const JsonAsset(super.path, this.backgroud);
+
+  final bool backgroud;
+
+  Future<Map<String, dynamic>> json() async {
+    final data = await load();
+    if (backgroud) {
+      return compute(
+        (message) {
+          return _parseToJson(message.materialize().asUint8List());
+        },
+        TransferableTypedData.fromList([data.buffer.asUint8List()]),
+      );
+    } else {
+      return _parseToJson(data.buffer.asUint8List());
+    }
+  }
+
+  Future<T> parse<T>(
+      Future<T> Function(Map<String, dynamic> json) parser) async {
+    final data = await load();
+    if (backgroud) {
+      return compute(
+        (message) {
+          final bytes = message.materialize().asUint8List();
+          return parser(_parseToJson(bytes));
+        },
+        TransferableTypedData.fromList([data.buffer.asUint8List()]),
+      );
+    } else {
+      return parser(_parseToJson(data.buffer.asUint8List()));
+    }
+  }
+
+  static Map<String, dynamic> _parseToJson(Uint8List bytes) {
+    final string = utf8.decode(bytes);
+    return jsonDecode(string);
   }
 }
 

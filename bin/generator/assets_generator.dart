@@ -63,7 +63,8 @@ final class AssetsGenerator {
     final imports = types.fold(
         <String>{},
         (previousValue, element) =>
-            {...previousValue, ...element.generatorImport()});
+            {...previousValue, ...element.generatorImport()}).toList()
+      ..sort();
 
     return '''
     ${imports.map((e) => "import '$e';").join('\n')}

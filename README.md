@@ -51,8 +51,10 @@ assets/
     |── share.png
 |── fonts/
     |── Roboto-Regular.ttf
-|── lottie
-    |── video_loading.json
+|── json/
+    |── test1.json
+|── lottie/
+    |── test1.json
 ```
 
 [生成的文件](https://github.com/cezres/gen_assets/blob/main/output/assets.g.dart)
@@ -62,7 +64,9 @@ assets/
 Assets.images.download.path; // 'assets/images/download.png'
 Assets.images.download.image(); // Image.asset('assets/images/download.png')
 Assets.fonts.robotoRegular.name; // 'Roboto-Regular'
-Assets.lottie.videoLoading.lottie(); // LottieBuilder.asset('assets/lottie/video_loading.json')
+Assets.json.test1.json(); // Future<Map<String, dynamic>>
+Assets.json.test1.parse((json) => json); // Future<T>
+Assets.lottie.test1.lottie(); // LottieBuilder.asset('assets/lottie/test1.json')
 ```
 
 ### 检查重复文件
@@ -146,7 +150,7 @@ Total reduction of 0.0138 MB
 - [ ] 支持更多的文件类型，以及其相应的便捷使用函数
     - [x] png、jpeg、webp、...
     - [ ] svg
-    - [ ] json
+    - [x] json
     - [ ] ini
     - [x] lottie
     - [ ] 其它
