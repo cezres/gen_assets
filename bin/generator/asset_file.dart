@@ -18,7 +18,7 @@ class AssetFile {
 
   factory AssetFile.fromPath(String path, String rootPath) {
     final String name = basenameWithoutExtension(path);
-    final String relativePath = path.replaceFirst(rootPath, '');
+    final String relativePath = path.replaceFirst('$rootPath/', '');
     return AssetFile(
       path: path,
       relativePath: relativePath,

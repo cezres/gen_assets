@@ -27,8 +27,6 @@ gen_assets:
 
 在工程根目录下添加 gen_assets.yaml 配置文件:
 ```yml
-# 示例
-
 # 资源文件根目录
 input_dir: assets
 
@@ -61,10 +59,10 @@ assets/
 
 生成文件后的使用方式
 ```dart
-Assets.images.download.path; // '/assets/images/download.png'
-Assets.images.download.image(); // Image.asset('/assets/images/download.png')
+Assets.images.download.path; // 'assets/images/download.png'
+Assets.images.download.image(); // Image.asset('assets/images/download.png')
 Assets.fonts.robotoRegular.name; // 'Roboto-Regular'
-Assets.lottie.videoLoading.lottie(); // LottieBuilder.asset('/assets/lottie/video_loading.json')
+Assets.lottie.videoLoading.lottie(); // LottieBuilder.asset('assets/lottie/video_loading.json')
 ```
 
 ### 检查重复文件
