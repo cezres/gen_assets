@@ -102,11 +102,5 @@ final class GenAssetsLock {
     final file = File(join(Directory.current.path, 'gen_assets.lock.json'));
 
     file.writeAsStringSync(string);
-
-    // String prettyJson = jsonEncode(
-    //   {},
-    //   toEncodable: (object) => object.toString(),
-    //   indent: '    ',
-    // );
   }
 }

@@ -4,8 +4,8 @@ import 'package:args/args.dart';
 import 'package:path/path.dart';
 import 'package:yaml/yaml.dart';
 
-import 'convert/convert_to_webp.dart';
-import 'convert/list_original_images.dart';
+import 'convert/convert_image_to_webp.dart';
+import 'convert/convert_json.dart';
 import 'generator/assets_generator.dart';
 import 'list_duplicates/list_duplicates.dart';
 
@@ -32,7 +32,9 @@ ArgParser buildParser() {
     )
     ..addCommand('cwebp')
     ..addCommand('list-cwebp-original')
-    ..addCommand('list-duplicates');
+    ..addCommand('list-duplicates')
+    ..addCommand('cjson')
+    ..addCommand('djson');
 }
 
 void printUsage(ArgParser argParser) {
@@ -72,6 +74,10 @@ void main(List<String> arguments) async {
       listOriginalImages(yaml);
     } else if (results.command?.name == 'list-duplicates') {
       await DuplicateFileDetector().listDuplicates();
+    } else if (results.command?.name == 'cjson') {
+      removeAllJsonWhitespace();
+    } else if (results.command?.name == 'djson') {
+      formatAllJsonWithWhitespace();
     } else {
       generateAssets(yaml);
     }

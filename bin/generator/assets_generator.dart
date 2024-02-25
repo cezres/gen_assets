@@ -54,15 +54,22 @@ final class AssetsGenerator {
     final types = rootDirectory.types;
     for (var element in types) {
       text = """
-      ${element.generatorImport()}
-      
       $text
-      
+
       ${element.generatorClass}
       """;
     }
 
-    return text;
+    final imports = types.fold(
+        <String>{},
+        (previousValue, element) =>
+            {...previousValue, ...element.generatorImport()});
+
+    return '''
+    ${imports.map((e) => "import '$e';").join('\n')}
+    
+    $text
+    ''';
   }
 }
 
@@ -73,13 +80,49 @@ extension UpperFirst on String {
 extension LowerFirst on String {
   String get lowerFirst => this[0].toLowerCase() + substring(1);
 
-  String get formatName {
-    var string = this;
-    if (isNotEmpty && _isDigit(this[0])) {
-      string = 'v$string';
-    }
-    return string.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
-  }
+  // String get formatName {
+  //   var string = this;
+  //   if (isNotEmpty && _isDigit(this[0])) {
+  //     string = 'v$string';
+  //   }
+  //   int index = 0;
+  //   while (true) {
+  //     // final index = string.indexOf(pattern)
+  //   }
+  //   return string.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
+  // }
+
+  String get formatName => _toValidVariableName(this);
 }
 
-bool _isDigit(String s) => (s.codeUnitAt(0) ^ 0x30) <= 9;
+String _toValidVariableName(String text) {
+  String validName = '';
+
+  bool capitalizeNext = false;
+
+  for (int i = 0; i < text.length; i++) {
+    String char = text[i];
+
+    if (RegExp('[A-Za-z0-9]').hasMatch(char)) {
+      if (capitalizeNext) {
+        char = char.toUpperCase();
+        capitalizeNext = false;
+      } else if (validName.isEmpty) {
+        char = char.toLowerCase();
+      }
+      validName += char;
+    } else {
+      if (validName.isNotEmpty) {
+        capitalizeNext = true;
+      }
+    }
+  }
+
+  if (validName.isEmpty || RegExp(r'^[0-9]').hasMatch(validName)) {
+    validName = 'var$validName';
+  }
+
+  return validName;
+}
+
+// bool _isDigit(String s) => (s.codeUnitAt(0) ^ 0x30) <= 9;

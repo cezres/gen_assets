@@ -50,6 +50,8 @@ class AssetDirectory {
         files.add(AssetFile.fromPath(entity.path, rootPath));
       }
     }
+    directories.sort((a, b) => a.name.compareTo(b.name));
+    files.sort((a, b) => a.name.compareTo(b.name));
     return AssetDirectory(
         name: name,
         directories: directories,
@@ -58,27 +60,44 @@ class AssetDirectory {
   }
 
   String generator(String baseName) {
-    String child = '';
-    String append = '';
+    String childText = '';
+    String appendText = '';
+
+    Map<String, List<String>> filePathsOfVariableName = {};
+    for (var element in directories) {
+      if (filePathsOfVariableName.containsKey(element.name)) {
+        filePathsOfVariableName[element.name]!.add(element.name);
+      } else {
+        filePathsOfVariableName[element.name] = [element.name];
+      }
+    }
+    for (var element in files) {
+      if (filePathsOfVariableName.containsKey(element.name)) {
+        filePathsOfVariableName[element.name]!.add(element.name);
+      } else {
+        filePathsOfVariableName[element.name] = [element.name];
+      }
+    }
 
     final prefix = baseName.isEmpty ? 'static ' : '';
     for (final AssetDirectory directory in directories) {
-      child +=
+      childText +=
           "$prefix ${directory.className} get ${directory.name} => const ${directory.className}();\n\n";
 
-      append += "${directory.generator(baseName + name.upperFirst)}\n";
+      appendText += "${directory.generator(baseName + name.upperFirst)}\n";
     }
     for (final AssetFile file in files) {
-      child += '$prefix ${file.generator()}\n';
+      childText +=
+          '$prefix ${file.generator(hasExtVariableName: (filePathsOfVariableName[file.name]?.length ?? 1) > 1)}\n';
     }
     return '''
     final class $baseName${name.upperFirst} {
       const $baseName${name.upperFirst}();
-      
-      $child
+
+      $childText
     }
 
-    $append
+    $appendText
     ''';
   }
 }

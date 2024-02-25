@@ -1,16 +1,29 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:path/path.dart';
 
 import 'asset_file.dart';
 
-AssetType assetTypeFromExtension(String ext) {
+AssetType assetTypeFromFilePath(String path) {
+  final ext = extension(path);
   switch (ext) {
     case '.png':
     case '.jpg':
     case '.jpeg':
     case '.webp':
+    case '.gif':
       return AssetType.image;
     case '.ttf':
       return AssetType.font;
+    case '.json':
+      final data = jsonDecode(File(path).readAsStringSync());
+      if (data is Map<String, dynamic>) {
+        if (data['v'] != null && data['nm'] != null && data['layers'] != null) {
+          return AssetType.lottie;
+        }
+      }
+      return AssetType.unknown;
     default:
       return AssetType.unknown;
   }
@@ -19,6 +32,7 @@ AssetType assetTypeFromExtension(String ext) {
 enum AssetType {
   image,
   font,
+  lottie,
   unknown;
 
   String get className {
@@ -27,18 +41,23 @@ enum AssetType {
         return 'ImageAsset';
       case AssetType.font:
         return 'FontAsset';
+      case AssetType.lottie:
+        return 'LottieAsset';
       case AssetType.unknown:
         return 'UnknownAsset';
     }
   }
 
-  String generatorImport() {
+  List<String> generatorImport() {
     switch (this) {
       case AssetType.image:
-        return "import 'package:flutter/widgets.dart';";
+        return ['package:flutter/widgets.dart'];
+      case AssetType.lottie:
+        return ['package:lottie/lottie.dart'];
       case AssetType.font:
+        return [];
       case AssetType.unknown:
-        return '';
+        return ['package:flutter/services.dart'];
     }
   }
 
@@ -48,6 +67,7 @@ enum AssetType {
         return '/// ![](${file.path})';
       case AssetType.unknown:
       case AssetType.font:
+      case AssetType.lottie:
         return '';
     }
   }
@@ -56,6 +76,7 @@ enum AssetType {
     switch (this) {
       case AssetType.image:
       case AssetType.unknown:
+      case AssetType.lottie:
         return 'const $className(\'${file.relativePath}\')';
       case AssetType.font:
         final basename = basenameWithoutExtension(file.relativePath);
@@ -66,7 +87,6 @@ enum AssetType {
   String get generatorClass {
     switch (this) {
       case AssetType.image:
-        // extension type ImageAsset(String name) {
         return '''
          final class ImageAsset { 
           const ImageAsset(this.path);
@@ -96,13 +116,75 @@ enum AssetType {
           final String name;
         }
         ''';
+      case AssetType.lottie:
+        return '''
+        final class LottieAsset {
+          const LottieAsset(this.path);
+
+          final String path;
+
+          LottieProvider get provider => AssetLottie(path);
+
+          Widget lottie({
+            Key? key,
+            Animation<double>? controller,
+            FrameRate? frameRate,
+            bool? animate,
+            bool? reverse,
+            bool? repeat,
+            LottieDelegates? delegates,
+            LottieOptions? options,
+            void Function(LottieComposition)? onLoaded,
+            Widget Function(BuildContext, Widget, LottieComposition?)? frameBuilder,
+            Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
+            double? width,
+            double? height,
+            BoxFit? fit,
+            AlignmentGeometry? alignment,
+            bool? addRepaintBoundary,
+            FilterQuality? filterQuality,
+            void Function(String)? onWarning,
+            RenderCache? renderCache,
+          }) {
+            return LottieBuilder(
+              key: key,
+              lottie: provider,
+              controller: controller,
+              frameRate: frameRate,
+              animate: animate,
+              reverse: reverse,
+              repeat: repeat,
+              delegates: delegates,
+              options: options,
+              onLoaded: onLoaded,
+              frameBuilder: frameBuilder,
+              errorBuilder: errorBuilder,
+              width: width,
+              height: height,
+              fit: fit,
+              alignment: alignment,
+              addRepaintBoundary: addRepaintBoundary,
+              filterQuality: filterQuality,
+              onWarning: onWarning,
+              renderCache: renderCache,
+            );
+          }
+        }
+        ''';
       case AssetType.unknown:
-        // extension type UnknownAsset(String name) {}
         return '''
         final class UnknownAsset {
           const UnknownAsset(this.path);
 
           final String path;
+
+          Future<ByteData> load() => rootBundle.load(path);
+
+          Future<Uint8List> loadBytes() =>
+              load().then((value) => value.buffer.asUint8List());
+
+          Future<String> loadString({bool cache = false}) =>
+              rootBundle.loadString(path, cache: cache);
         }
         ''';
     }

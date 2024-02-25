@@ -23,14 +23,20 @@ class AssetFile {
       path: path,
       relativePath: relativePath,
       name: name,
-      type: assetTypeFromExtension(extension(path)),
+      type: assetTypeFromFilePath(path),
     );
   }
 
-  String generator() {
+  String generator({bool hasExtVariableName = true}) {
+    final String ext;
+    if (hasExtVariableName) {
+      ext = extension(relativePath).replaceFirst('.', '').upperFirst;
+    } else {
+      ext = '';
+    }
     return """
     ${type.generatorComment(this)}
-    ${type.className} get ${name.formatName.lowerFirst} => ${type.generatorConstruct(this)};
+    ${type.className} get ${name.formatName.lowerFirst}$ext => ${type.generatorConstruct(this)};
     """;
   }
 }

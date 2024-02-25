@@ -2,13 +2,15 @@
 
 
 - [x] [根据资源文件目录生成对应的 Dart 代码](#生成代码)
-    - [ ] 缓存策略，无、弱引用、短时、长时、永久，内存警告时释放。
+    - [ ] 缓存策略，无、弱引用、短时、长时、永久，LruCache，内存警告时释放。
+    - [ ] 国际化、浅色/深色
     - [ ] 根据配置文件中的限制，对部分类型的大型文件例如大JSON文件的解码及实例化使用 compute
 - [ ] 分析项目中未引用的资源文件
 - [x] [检查重复文件](#检查重复文件)
 - [ ] 相似文件
 - [ ] 压缩文件
     - [x] [压缩图片文件至 WebP 格式](#压缩图片文件)
+    - [x] [JSON 移除空格换行缩进](#压缩-json-文件)
 - [ ] CI/CD
 - [ ] 云存储部分低频或大型资源文件以减小包体积
 - [ ] [一些实现上的初略想法](#一些实现上的初略想法)
@@ -32,9 +34,6 @@ input_dir: assets
 
 # 生成的代码路径
 output: output/assets.g.dart
-
-# 工程代码根目录，用于识别未使用的资源文件
-source_dir: bin
 ```
 
 ### 生成代码
@@ -54,6 +53,8 @@ assets/
     |── share.png
 |── fonts/
     |── Roboto-Regular.ttf
+|── lottie
+    |── video_loading.json
 ```
 
 [生成的文件](https://github.com/cezres/gen_assets/blob/main/output/assets.g.dart)
@@ -63,6 +64,7 @@ assets/
 Assets.images.download.path; // '/assets/images/download.png'
 Assets.images.download.image(); // Image.asset('/assets/images/download.png')
 Assets.fonts.robotoRegular.name; // 'Roboto-Regular'
+Assets.lottie.videoLoading.lottie(); // LottieBuilder.asset('/assets/lottie/video_loading.json')
 ```
 
 ### 检查重复文件
@@ -122,6 +124,18 @@ Y
 All original images deleted.
 ```
 
+### 压缩 JSON 文件
+
+**移除空格换行缩进:**
+```shell
+dart run gen_assets cjson
+```
+
+**输出:**
+```shell
+18960 --> 4524 -- /assets/lottie/living_push.json
+Total reduction of 0.0138 MB
+```
 
 ## 一些实现上的初略想法
 
@@ -136,26 +150,25 @@ All original images deleted.
     - [ ] svg
     - [ ] json
     - [ ] ini
-    - [ ] 其它，路径、二进制数据、字符串
-    - [ ] 可以考虑 Dart 3.3 的 `extension type` 减少类型包装的开销。
+    - [x] lottie
+    - [ ] 其它
+    - [ ] Dart 3.3 可以使用 `extension type` 减少类型包装的开销。
 - [ ] 支持排除文件，目录路径、文件路径、文件类型
 
 
 ### 分析项目中未引用的资源文件
 
 - [ ] 静态分析。
-    - 由于使用了自动生成的代码引用资源文件，从代码文件中分析类和函数调用，从特征上来说比之前的字符串更容易精准识别。
+    - 由于使用了自动生成的代码引用资源文件，从代码文件中分析类和函数中的引用，从特征上来说比之前的字符串更容易识别。
     - 对于间接引用或引用但不会执行的部分不易精准识别。
 - [ ] 动态分析。
     - 开发环境使用不同的配置生成代码以在引用时记录相关数据。
 
-### 根据配置文件中的限制，对部分类型的大型文件的加载将使用 compute
+### 根据配置文件中的限制，对部分类型的大型文件的加载和预处理使用 compute
 
-- [ ] 对于受 rootBundle 限制无法在 Isolate 读取的大型资源文件如大JSON文件，将解码与对象实例化的步骤放在 Isoalte，使用TransferableTypedData和Isolate.exit 不会产生额外的复制性能损耗，但有 Isolate 的创建损耗。
+- [ ] 将大型资源文件例如大JSON文件的解码与对象实例化的步骤放在 Isoalte，使用 TransferableTypedData 和 Isolate.exit 不会产生额外的复制性能损耗，但有 Isolate 的创建损耗。
     - [ ] 复用 Isolate 的话也有回传复制的损耗，考虑合并短时间内的任务。
-- [ ] 对于不受 rootBundle 限制的云存储资源文件使用 compute 加载。
-- [ ] 对于支持 BackgroundIsolateBinaryMessenger 的版本，添加一些额外的平台实现以支持完全在 Isolate 中加载App包内的大型资源文件。 
-    - [ ] rootBundle 也就是 PlatformAssetBundle，看起来是通过发送`flutter/assets`消息由原生平台加载，读取过程应该不必优化至 Isolate，需要实测对比。
+- [ ] 对于不受 rootBundle 限制的云存储资源文件使用 compute 加载及预处理。
 
 ### 多 packages 工程的资源管理？
 
@@ -178,12 +191,12 @@ All original images deleted.
                 - 开发环境版本的代码使用自定义的 ImageProvider 获取到被监听或取消监听
             - 记录应用程序退出时间
     - 根据云存储资源文件的配置表
-        - 配置 OSS Key ，使用命令批量上传云存储资源文件
+        - 配置 oss key ，使用命令批量上传云存储资源文件
         - 所有文件全量放在项目目录下，但通过工具自动维护 pubspec.yaml 的 assets 依赖
-- [ ] 不同版本云存储资源文件的管理？
+- [ ] 不同版本的文件？
     - 读取运行目录下的 pubspec.yaml 中的 version 作为存储时区分版本的上级目录
 - [ ] 预加载网络资源的组件
     - 添加低优先级的预加载后台任务，需要做好任务调度不影响活跃模块的对网络的使用
-    - 根据统计数据，计算更合适的预加载顺序，优先加载引用更多更早的文件
+    - 根据统计数据及当前页面路由状态，使用更合适的预加载顺序
 - [ ] CI/CD？
 
