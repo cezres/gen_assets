@@ -36,12 +36,16 @@ final class AssetsImages {
 final class AssetsLottie {
   const AssetsLottie();
 
+  LottieAsset get livingPush =>
+      const LottieAsset('/assets/lottie/living_push.json');
+
   LottieAsset get videoLoading =>
       const LottieAsset('/assets/lottie/video_loading.json');
 }
 
 final class FontAsset {
   const FontAsset(this.name);
+
   final String name;
 }
 

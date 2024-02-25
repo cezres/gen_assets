@@ -113,6 +113,7 @@ enum AssetType {
         return '''
         final class FontAsset {
           const FontAsset(this.name);
+          
           final String name;
         }
         ''';
