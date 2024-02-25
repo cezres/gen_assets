@@ -59,7 +59,7 @@ class AssetDirectory {
         className: className);
   }
 
-  String generator(String baseName) {
+  String generator(String parent) {
     String childText = '';
     String appendText = '';
 
@@ -79,20 +79,20 @@ class AssetDirectory {
       }
     }
 
-    final prefix = baseName.isEmpty ? 'static ' : '';
+    final prefix = parent.isEmpty ? 'static ' : '';
     for (final AssetDirectory directory in directories) {
       childText +=
           "$prefix ${directory.className} get ${directory.name} => const ${directory.className}();\n\n";
 
-      appendText += "${directory.generator(baseName + name.upperFirst)}\n";
+      appendText += "${directory.generator(parent + name.upperFirst)}\n";
     }
     for (final AssetFile file in files) {
       childText +=
           '$prefix ${file.generator(hasExtVariableName: (filePathsOfVariableName[file.name]?.length ?? 1) > 1)}\n';
     }
     return '''
-    final class $baseName${name.upperFirst} {
-      const $baseName${name.upperFirst}${baseName.isEmpty ? "._" : ""}();
+    final class $parent${name.upperFirst} {
+      const $parent${name.upperFirst}${parent.isEmpty ? "._" : ""}();
 
       $childText
     }
