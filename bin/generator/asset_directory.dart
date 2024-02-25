@@ -36,7 +36,7 @@ class AssetDirectory {
     String baseClassName,
   ) {
     final String name = basename(path);
-    final String className = baseClassName + name.upperFirst;
+    final String className = baseClassName + name.formatClassName;
     final List<FileSystemEntity> entities = Directory(path).listSync();
     final List<AssetDirectory> directories = <AssetDirectory>[];
     final List<AssetFile> files = <AssetFile>[];

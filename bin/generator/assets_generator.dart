@@ -66,6 +66,10 @@ extension LowerFirst on String {
   String get formatVariableName {
     return replaceAll('-', '').lowerFirst;
   }
+
+  String get formatClassName {
+    return replaceAll(r'[^a-zA-Z0-9_]', '_').upperFirst;
+  }
 }
 
 String formatVariableName() {
