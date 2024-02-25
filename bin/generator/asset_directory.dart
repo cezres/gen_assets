@@ -92,7 +92,7 @@ class AssetDirectory {
     }
     return '''
     final class $baseName${name.upperFirst} {
-      const $baseName${name.upperFirst}();
+      const $baseName${name.upperFirst}${baseName.isEmpty ? "._" : ""}();
 
       $childText
     }

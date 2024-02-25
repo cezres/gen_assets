@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
 
 final class Assets {
-  const Assets();
+  const Assets._();
 
   static AssetsFonts get fonts => const AssetsFonts();
 
@@ -21,26 +21,26 @@ final class AssetsImages {
   const AssetsImages();
 
   /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/download.png)
-  ImageAsset get download => const ImageAsset('/assets/images/download.png');
+  ImageAsset get download => const ImageAsset('assets/images/download.png');
 
   /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/download_1.png)
-  ImageAsset get download1 => const ImageAsset('/assets/images/download_1.png');
+  ImageAsset get download1 => const ImageAsset('assets/images/download_1.png');
 
   /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/refresh.png)
-  ImageAsset get refresh => const ImageAsset('/assets/images/refresh.png');
+  ImageAsset get refresh => const ImageAsset('assets/images/refresh.png');
 
   /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/share.png)
-  ImageAsset get share => const ImageAsset('/assets/images/share.png');
+  ImageAsset get share => const ImageAsset('assets/images/share.png');
 }
 
 final class AssetsLottie {
   const AssetsLottie();
 
   LottieAsset get livingPush =>
-      const LottieAsset('/assets/lottie/living_push.json');
+      const LottieAsset('assets/lottie/living_push.json');
 
   LottieAsset get videoLoading =>
-      const LottieAsset('/assets/lottie/video_loading.json');
+      const LottieAsset('assets/lottie/video_loading.json');
 }
 
 final class FontAsset {

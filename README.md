@@ -88,8 +88,8 @@ Total Extra Size: 0.0008 MB
 # 需要转换到 webp 格式的图片文件后缀
 convert_to_webp: [png, jpg, jpeg]
 
-# cwebp 的安装路径，用于压缩图片文件。 /usr/local/bin/cwebp
-cwebp_path: /Users/cezres/Downloads/libwebp-1.3.2-mac-arm64 2/bin/cwebp
+# cwebp 的路径，用于压缩图片文件
+cwebp_path: /usr/local/bin/cwebp
 ```
 
 **压缩图片，并保留原始文件，完成后输出减少的体积:**
@@ -164,11 +164,7 @@ Total reduction of 0.0138 MB
 
 ### 根据配置文件中的限制，对部分类型的大型文件的加载和预处理使用 compute
 
-- [ ] 将大型资源文件例如大JSON文件的解码与对象实例化的步骤放在 Isoalte，使用 TransferableTypedData 和 Isolate.exit 不会产生额外的复制性能损耗，但有 Isolate 的创建损耗。
-    - [ ] 复用 Isolate 的话也有回传复制的损耗，考虑合并短时间内的任务。
-- [ ] 对于不受 rootBundle 限制的云存储资源文件使用 compute 加载及预处理。
-
-### 多 packages 工程的资源管理？
+- [ ] 使用 TransferableTypedData 和 Isolate.exit 不会产生额外的复制，但有 Isolate 的创建损耗，考虑合并短时间内(同一帧间隔)的任务。
 
 ### CI/CD?
 
@@ -183,18 +179,20 @@ Total reduction of 0.0138 MB
     - 根据统计数据和配置文件中的限制自动生成匹配的资源文件列表
         - 在开发环境使用不同的配置生成代码，在资源被引用时记录相关参数.
         - 适合云存储资源文件的相关数据指标
-            - 首次引用时距离应用启动的时间
-            - 资源文件大小
-            - 引用的总持续时间
-                - 开发环境版本的代码使用自定义的 ImageProvider 获取到被监听或取消监听
-            - 记录应用程序退出时间
+            - 引用时距离应用启动的时间
+            - 引用时所处的页面/组件
+                - 通过 StackTrace.current 获取函数调用栈，从中获取引用的组件名称。
+                - x 通过 context 向上查询最近的 scaffold.appBar.title
+            - 文件大小
+            - 引用次数
     - 根据云存储资源文件的配置表
         - 配置 oss key ，使用命令批量上传云存储资源文件
         - 所有文件全量放在项目目录下，但通过工具自动维护 pubspec.yaml 的 assets 依赖
 - [ ] 不同版本的文件？
     - 读取运行目录下的 pubspec.yaml 中的 version 作为存储时区分版本的上级目录
-- [ ] 预加载网络资源的组件
+- [ ] 预加载网络资源
     - 添加低优先级的预加载后台任务，需要做好任务调度不影响活跃模块的对网络的使用
-    - 根据统计数据及当前页面路由状态，使用更合适的预加载顺序
+    - 根据统计数据及当前页面状态，使用更合适的预加载顺序
 - [ ] CI/CD？
 
+### 多 packages 工程的资源管理？
