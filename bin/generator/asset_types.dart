@@ -1,3 +1,5 @@
+import 'package:path/path.dart';
+
 import 'asset_file.dart';
 
 AssetType assetTypeFromExtension(String ext) {
@@ -7,6 +9,8 @@ AssetType assetTypeFromExtension(String ext) {
     case '.jpeg':
     case '.webp':
       return AssetType.image;
+    case '.ttf':
+      return AssetType.font;
     default:
       return AssetType.unknown;
   }
@@ -14,12 +18,15 @@ AssetType assetTypeFromExtension(String ext) {
 
 enum AssetType {
   image,
+  font,
   unknown;
 
   String get className {
     switch (this) {
       case AssetType.image:
         return 'ImageAsset';
+      case AssetType.font:
+        return 'FontAsset';
       case AssetType.unknown:
         return 'UnknownAsset';
     }
@@ -30,19 +37,31 @@ enum AssetType {
       case AssetType.image:
         return '/// ![](${file.path})';
       case AssetType.unknown:
+      case AssetType.font:
         return '';
     }
   }
 
-  String get generator {
+  String generatorConstruct(AssetFile file) {
+    switch (this) {
+      case AssetType.image:
+      case AssetType.unknown:
+        return 'const $className(\'${file.relativePath}\')';
+      case AssetType.font:
+        final basename = basenameWithoutExtension(file.relativePath);
+        return 'const $className(\'$basename\')';
+    }
+  }
+
+  String get generatorClass {
     switch (this) {
       case AssetType.image:
         // extension type ImageAsset(String name) {
         return '''
          final class ImageAsset { 
-          const ImageAsset(this.name);
+          const ImageAsset(this.path);
 
-          final String name;
+          final String path;
 
           Widget image({
             double? width,
@@ -60,13 +79,20 @@ enum AssetType {
           }
         }
         ''';
+      case AssetType.font:
+        return '''
+        final class FontAsset {
+          const FontAsset(Sring name);
+          final String name;
+        }
+        ''';
       case AssetType.unknown:
         // extension type UnknownAsset(String name) {}
         return '''
         final class UnknownAsset {
-          const UnknownAsset(this.name);
+          const UnknownAsset(this.path);
 
-          final String name;
+          final String path;
         }
         ''';
     }

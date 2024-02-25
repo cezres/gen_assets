@@ -2,13 +2,18 @@
 
 
 - [x] [根据资源文件目录生成对应的 Dart 代码](#生成代码)
+    - [ ] 缓存策略，无、弱引用、5分钟、30分钟、永久
+    - [ ] 根据配置文件中的限制，对部分类型的大型文件的加载将使用 compute，
+        - [ ] 对于受 rootBundle 限制的大型资源文件例如大JSON文件，将解码与对象实例化的步骤放在 Isoalte，使用TransferableTypedData和Isolate.exit 不会产生额外的复制性能损耗，但有 Isolate 的创建损耗。
+        - [ ] 对于不受 rootBundle 限制的云存储资源文件使用 compute 加载。
+        - [ ] 对于支持 BackgroundIsolateBinaryMessenger 的版本，添加一些额外的平台实现以支持完全在 Isolate 中加载App包内的大型资源文件。 
 - [ ] [分析项目中未引用的资源文件](#分析项目中未引用的资源文件)
-- [ ] 检查重复文件
+- [x] [检查重复文件](#检查重复文件)
 - [ ] 相似文件
 - [ ] 压缩文件
     - [x] [压缩图片文件至 WebP 格式](#压缩图片文件)
-- [ ] [支持云存储部分低频或大型资源文件以减小包体积](#支持云存储部分低频或大型资源文件以减小包体积)
 - [ ] CI/CD
+- [ ] [支持云存储部分低频或大型资源文件以减小包体积](#支持云存储部分低频或大型资源文件以减小包体积)
 
 
 ## 如何使用
@@ -34,10 +39,10 @@ output: output/assets.g.dart
 # 工程代码根目录，用于识别未使用的资源文件
 source_dir: bin
 
-# 需要转换到webp格式的图片文件后缀
+# 需要转换到 webp 格式的图片文件后缀
 convert_to_webp: [png]
 
-# cwebp 的安装路径 /usr/local/bin/cwebp
+# cwebp 的安装路径，用于压缩图片文件。 /usr/local/bin/cwebp
 cwebp_path: /Users/cezres/Downloads/libwebp-1.3.2-mac-arm64 2/bin/cwebp
 ```
 
@@ -45,7 +50,6 @@ cwebp_path: /Users/cezres/Downloads/libwebp-1.3.2-mac-arm64 2/bin/cwebp
 
 运行
 ```bash
-# 根据配置生成代码文件
 $ dart run gen_assets
 ```
 
@@ -54,6 +58,7 @@ $ dart run gen_assets
 assets/
 ├── images/
     |── download.png
+    |── download_1.png
     |── refresh.png
     |── share.png
 |── fonts/
@@ -64,11 +69,22 @@ assets/
 
 生成文件后的使用方式
 ```dart
-Assets.images.download.name; // '/assets/images/download.png'
+Assets.images.download.path; // '/assets/images/download.png'
 Assets.images.download.image(); // Image.asset('/assets/images/download.png')
-Assets.fonts.robotoRegular.name; // '/assets/fonts/Roboto-Regular.ttf'
+Assets.fonts.robotoRegular.name; // 'Roboto-Regular'
 ```
 
+### 检查重复文件
+
+```bash
+dart run gen_assets list-duplicates
+```
+
+**输出:**
+```shell
+Duplicate Files:
+[/assets/images/download.png, /assets/images/download_1.png]
+```
 
 ### 压缩图片文件
 
@@ -81,8 +97,6 @@ dart run gen_assets --cwebp
 
 **输出:**
 ```shell
-Building package executable... 
-Built gen_assets:gen_assets.
 1/3 /assets/images/download.png --> /assets/images/download.webp
 2/3 /assets/images/share.png --> /assets/images/share.webp
 3/3 /assets/images/refresh.png --> /assets/images/refresh.webp
@@ -98,8 +112,6 @@ dart run gen_assets --list_cwebp_original
 
 **输出:**
 ```shell
-Building package executable... 
-Built gen_assets:gen_assets.
 1. /assets/images/refresh.png
 2. /assets/images/download.png
 3. /assets/images/share.png

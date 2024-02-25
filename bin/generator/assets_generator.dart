@@ -48,7 +48,7 @@ final class AssetsGenerator {
     final types = rootDirectory.types;
 
     for (var element in types) {
-      text += element.generator;
+      text += element.generatorClass;
       text += '\n';
     }
 

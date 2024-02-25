@@ -10,6 +10,10 @@ final class AssetsImages {
   /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/download.png)
   ImageAsset get download => const ImageAsset('/assets/images/download.png');
 
+  /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/download_1.png)
+  ImageAsset get download_1 =>
+      const ImageAsset('/assets/images/download_1.png');
+
   /// ![](/Users/cezres/Documents/GitHub/gen_assets/assets/images/share.png)
   ImageAsset get share => const ImageAsset('/assets/images/share.png');
 
@@ -20,14 +24,13 @@ final class AssetsImages {
 final class AssetsFonts {
   const AssetsFonts();
 
-  UnknownAsset get robotoRegular =>
-      const UnknownAsset('/assets/fonts/Roboto-Regular.ttf');
+  FontAsset get robotoRegular => const FontAsset('Roboto-Regular');
 }
 
 final class ImageAsset {
-  const ImageAsset(this.name);
+  const ImageAsset(this.path);
 
-  final String name;
+  final String path;
 
   Widget image({
     double? width,
@@ -45,8 +48,7 @@ final class ImageAsset {
   }
 }
 
-final class UnknownAsset {
-  const UnknownAsset(this.name);
-
+final class FontAsset {
+  const FontAsset(Sring name);
   final String name;
 }

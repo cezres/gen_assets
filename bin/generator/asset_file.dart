@@ -30,7 +30,7 @@ class AssetFile {
   String generator() {
     return """
     ${type.generatorComment(this)}
-    ${type.className} get ${name.formatVariableName} => const ${type.className}('$relativePath');
+    ${type.className} get ${name.formatVariableName} => ${type.generatorConstruct(this)};
     """;
   }
 }

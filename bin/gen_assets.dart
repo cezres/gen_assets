@@ -7,6 +7,7 @@ import 'package:yaml/yaml.dart';
 import 'convert/convert_to_webp.dart';
 import 'convert/list_original_images.dart';
 import 'generator/assets_generator.dart';
+import 'list_duplicates/list_duplicates.dart';
 
 const String version = '0.0.1';
 
@@ -40,7 +41,8 @@ ArgParser buildParser() {
       abbr: 'l',
       negatable: false,
       help: 'List all original images converted to webp.',
-    );
+    )
+    ..addCommand('list-duplicates');
 }
 
 void printUsage(ArgParser argParser) {
@@ -78,6 +80,8 @@ void main(List<String> arguments) async {
       converToWebp(yaml);
     } else if (results.wasParsed('list_cwebp_original')) {
       listOriginalImages(yaml);
+    } else if (results.command?.name == 'list-duplicates') {
+      await DuplicateFileDetector().listDuplicates();
     } else {
       generateAssets(yaml);
     }

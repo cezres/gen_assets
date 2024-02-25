@@ -1,0 +1,29 @@
+{
+    "md5": {
+        "/assets/images/download.png": {
+            "size": 856,
+            "modified": 1695283156000,
+            "md5": "dpjqH+oiZEIH7HdbCorxfg=="
+        },
+        "/assets/images/download_1.png": {
+            "size": 856,
+            "modified": 1695283156000,
+            "md5": "dpjqH+oiZEIH7HdbCorxfg=="
+        },
+        "/assets/images/share.png": {
+            "size": 1819,
+            "modified": 1695283176000,
+            "md5": "B2FOejcgK9n6PaFGP3HGZw=="
+        },
+        "/assets/images/refresh.png": {
+            "size": 1389,
+            "modified": 1695283080000,
+            "md5": "uLuhKE6OHr59Lw/aXSdIOg=="
+        },
+        "/assets/fonts/Roboto-Regular.ttf": {
+            "size": 168260,
+            "modified": 347130062000,
+            "md5": "ijYgW9m4PgOvBZGgBLyX9A=="
+        }
+    }
+}
