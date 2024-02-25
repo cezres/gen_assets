@@ -10,7 +10,7 @@ output: output/assets.g.dart
 source_dir: bin
 
 # 需要转换到 webp 格式的图片文件后缀
-convert_to_webp: [png]
+convert_to_webp: [png, jpg, jpeg]
 
 # cwebp 的安装路径，用于压缩图片文件。 /usr/local/bin/cwebp
 cwebp_path: /Users/cezres/Downloads/libwebp-1.3.2-mac-arm64 2/bin/cwebp
@@ -21,5 +21,4 @@ compute:
   limit: 100
   # compute 加载的文件类型
   types: [json]
-
 

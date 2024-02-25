@@ -32,6 +32,16 @@ enum AssetType {
     }
   }
 
+  String generatorImport() {
+    switch (this) {
+      case AssetType.image:
+        return "import 'package:flutter/widgets.dart';";
+      case AssetType.font:
+      case AssetType.unknown:
+        return '';
+    }
+  }
+
   String generatorComment(AssetFile file) {
     switch (this) {
       case AssetType.image:
@@ -70,7 +80,7 @@ enum AssetType {
             Color? color,
           }) {
             return Image.asset(
-              name,
+              path,
               width: width,
               height: height,
               fit: fit,
@@ -82,7 +92,7 @@ enum AssetType {
       case AssetType.font:
         return '''
         final class FontAsset {
-          const FontAsset(Sring name);
+          const FontAsset(this.name);
           final String name;
         }
         ''';

@@ -30,18 +30,8 @@ ArgParser buildParser() {
       negatable: false,
       help: 'Print the tool version.',
     )
-    ..addFlag(
-      'cwebp',
-      abbr: 'c',
-      negatable: false,
-      help: 'Convert images to webp format.',
-    )
-    ..addFlag(
-      'list_cwebp_original',
-      abbr: 'l',
-      negatable: false,
-      help: 'List all original images converted to webp.',
-    )
+    ..addCommand('cwebp')
+    ..addCommand('list-cwebp-original')
     ..addCommand('list-duplicates');
 }
 
@@ -76,9 +66,9 @@ void main(List<String> arguments) async {
     final yaml = loadGenAssetsYaml();
     // listOriginalImages(yaml);
 
-    if (results.wasParsed('cwebp')) {
+    if (results.command?.name == 'cwebp') {
       converToWebp(yaml);
-    } else if (results.wasParsed('list_cwebp_original')) {
+    } else if (results.command?.name == 'list-cwebp-original') {
       listOriginalImages(yaml);
     } else if (results.command?.name == 'list-duplicates') {
       await DuplicateFileDetector().listDuplicates();

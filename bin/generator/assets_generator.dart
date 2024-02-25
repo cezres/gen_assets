@@ -50,11 +50,16 @@ final class AssetsGenerator {
 
   String generator() {
     String text = rootDirectory.generator('');
-    final types = rootDirectory.types;
 
+    final types = rootDirectory.types;
     for (var element in types) {
-      text += element.generatorClass;
-      text += '\n';
+      text = """
+      ${element.generatorImport()}
+      
+      $text
+      
+      ${element.generatorClass}
+      """;
     }
 
     return text;
@@ -71,7 +76,7 @@ extension LowerFirst on String {
   String get formatName {
     var string = this;
     if (isNotEmpty && _isDigit(this[0])) {
-      string = '_$string';
+      string = 'v$string';
     }
     return string.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
   }

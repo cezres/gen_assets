@@ -2,16 +2,16 @@
 
 
 - [x] [根据资源文件目录生成对应的 Dart 代码](#生成代码)
-    - [ ] 缓存策略，无、弱引用、5分钟、30分钟、永久
+    - [ ] 缓存策略，无、弱引用、短时、长时、永久，内存警告时释放。
     - [ ] 根据配置文件中的限制，对部分类型的大型文件例如大JSON文件的解码及实例化使用 compute
-- [ ] [分析项目中未引用的资源文件](#分析项目中未引用的资源文件)
+- [ ] 分析项目中未引用的资源文件
 - [x] [检查重复文件](#检查重复文件)
 - [ ] 相似文件
 - [ ] 压缩文件
     - [x] [压缩图片文件至 WebP 格式](#压缩图片文件)
 - [ ] CI/CD
-- [ ] [云存储部分低频或大型资源文件以减小包体积](#云存储部分低频或大型资源文件以减小包体积)
-
+- [ ] 云存储部分低频或大型资源文件以减小包体积
+- [ ] [一些实现上的初略想法](#一些实现上的初略想法)
 
 ## 如何使用
 
@@ -35,12 +35,6 @@ output: output/assets.g.dart
 
 # 工程代码根目录，用于识别未使用的资源文件
 source_dir: bin
-
-# 需要转换到 webp 格式的图片文件后缀
-convert_to_webp: [png]
-
-# cwebp 的安装路径，用于压缩图片文件。 /usr/local/bin/cwebp
-cwebp_path: /Users/cezres/Downloads/libwebp-1.3.2-mac-arm64 2/bin/cwebp
 ```
 
 ### 生成代码
@@ -89,9 +83,18 @@ Total Extra Size: 0.0008 MB
 
 需要先确保本机安装了 Google WebP [下载并安装 WebP](https://developers.google.com/speed/webp/download?hl=zh-cn)。
 
-**压缩图片，并保留原始文件，完成后输出减少的体积**
+**更新 gen_assets.yaml 文件:**
+```yaml
+# 需要转换到 webp 格式的图片文件后缀
+convert_to_webp: [png, jpg, jpeg]
+
+# cwebp 的安装路径，用于压缩图片文件。 /usr/local/bin/cwebp
+cwebp_path: /Users/cezres/Downloads/libwebp-1.3.2-mac-arm64 2/bin/cwebp
+```
+
+**压缩图片，并保留原始文件，完成后输出减少的体积:**
 ```bash
-dart run gen_assets --cwebp
+dart run gen_assets cwebp
 ```
 
 **输出:**
@@ -104,9 +107,9 @@ New size: 1.645 KB
 Compression ratio: 41.4370%
 ```
 
-**列出已被压缩的原始文件，输入 'Y' 确认后删除**
+**列出已被压缩的原始文件，输入 'Y' 确认后删除:**
 ```shell
-dart run gen_assets --list_cwebp_original
+dart run gen_assets list-cwebp-original
 ```
 
 **输出:**
@@ -133,14 +136,18 @@ All original images deleted.
     - [ ] svg
     - [ ] json
     - [ ] ini
-    - [x] 其它，路径、二进制数据、字符串
+    - [ ] 其它，路径、二进制数据、字符串
     - [ ] 可以考虑 Dart 3.3 的 `extension type` 减少类型包装的开销。
 - [ ] 支持排除文件，目录路径、文件路径、文件类型
 
 
 ### 分析项目中未引用的资源文件
 
-由于使用了自动生成的代码引用资源文件，从代码文件中分析类和函数调用，从特征上来说比以前的字符串更容易精准识别。
+- [ ] 静态分析。
+    - 由于使用了自动生成的代码引用资源文件，从代码文件中分析类和函数调用，从特征上来说比之前的字符串更容易精准识别。
+    - 对于间接引用或引用但不会执行的部分不易精准识别。
+- [ ] 动态分析。
+    - 开发环境使用不同的配置生成代码以在引用时记录相关数据。
 
 ### 根据配置文件中的限制，对部分类型的大型文件的加载将使用 compute
 

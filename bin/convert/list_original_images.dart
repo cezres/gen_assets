@@ -24,6 +24,7 @@ void listOriginalImages(dynamic yaml) async {
   for (var i = 0; i < files.length; i++) {
     print('${i + 1}. ${files[i].replaceFirst(Directory.current.path, '')}');
   }
+  print('Total original images: ${files.length}');
   print('Enter \'Y\' to delete all original images:');
 
   final input = stdin.readLineSync();
