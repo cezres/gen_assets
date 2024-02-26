@@ -210,7 +210,7 @@ enum AssetType {
                 (message) {
                   return _parseToJson(message.materialize().asUint8List());
                 },
-                TransferableTypedData.fromList([data.buffer.asUint8List()]),
+                TransferableTypedData.fromList([data]),
               );
             } else {
               return _parseToJson(data.buffer.asUint8List());
@@ -226,7 +226,7 @@ enum AssetType {
                   final bytes = message.materialize().asUint8List();
                   return parser(_parseToJson(bytes));
                 },
-                TransferableTypedData.fromList([data.buffer.asUint8List()]),
+                TransferableTypedData.fromList([data]),
               );
             } else {
               return parser(_parseToJson(data.buffer.asUint8List()));
