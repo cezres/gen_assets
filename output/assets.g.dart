@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:isolate';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
 
@@ -83,22 +84,26 @@ final class JsonAsset extends UnknownAsset {
 
   final bool backgroud;
 
-  Future<Map<String, dynamic>> json() async {
-    final data = await load();
-    if (backgroud) {
-      return compute(
-        (message) {
-          return _parseToJson(message.materialize().asUint8List());
-        },
-        TransferableTypedData.fromList([data.buffer.asUint8List()]),
-      );
-    } else {
-      return _parseToJson(data.buffer.asUint8List());
-    }
+  Future<Map<String, dynamic>> json({bool cache = false}) async {
+    return AssetsCache.instance.putIfAbsent('$path-json', cache, () async {
+      final data = await load();
+      final Map<String, dynamic> result;
+      if (backgroud) {
+        result = await compute(
+          (message) {
+            return _parseToJson(message.materialize().asUint8List());
+          },
+          TransferableTypedData.fromList([data]),
+        );
+      } else {
+        result = _parseToJson(data.buffer.asUint8List());
+      }
+      return (result, data.lengthInBytes);
+    });
   }
 
   Future<T> parse<T>(
-      FutureOr<T> Function(Map<String, dynamic> json) parser) async {
+      FutureOr<T> Function(Map<String, dynamic> value) parser) async {
     final data = await load();
     if (backgroud) {
       return compute(
@@ -106,7 +111,7 @@ final class JsonAsset extends UnknownAsset {
           final bytes = message.materialize().asUint8List();
           return parser(_parseToJson(bytes));
         },
-        TransferableTypedData.fromList([data.buffer.asUint8List()]),
+        TransferableTypedData.fromList([data]),
       );
     } else {
       return parser(_parseToJson(data.buffer.asUint8List()));
@@ -116,6 +121,108 @@ final class JsonAsset extends UnknownAsset {
   static Map<String, dynamic> _parseToJson(Uint8List bytes) {
     final string = utf8.decode(bytes);
     return jsonDecode(string);
+  }
+}
+
+class UnknownAsset {
+  const UnknownAsset(this.path);
+
+  final String path;
+
+  Future<ByteData> load({bool cache = false}) =>
+      AssetsCache.instance.putIfAbsent('$path-load', cache, () async {
+        final data = await rootBundle.load(path);
+        return (data, data.lengthInBytes);
+      });
+
+  Future<String> loadString({bool cache = false}) =>
+      AssetsCache.instance.putIfAbsent('$path-loadString', cache, () async {
+        final data = await load();
+        return (utf8.decode(Uint8List.sublistView(data)), data.lengthInBytes);
+      });
+}
+
+final class AssetsCache {
+  AssetsCache._();
+
+  static AssetsCache instance = AssetsCache._();
+
+  final _cache = LruCache<String, dynamic>();
+
+  Future<T> putIfAbsent<T>(
+      String key, bool cache, FutureOr<(T, int)> Function() ifAbsent) async {
+    if (!cache) {
+      return (await ifAbsent()).$1;
+    }
+    return _cache.putIfAbsent(key, ifAbsent).then((value) => value as T);
+  }
+
+  void evict(String key) {
+    _cache.evict(key);
+  }
+
+  void clear() {
+    _cache.clear();
+  }
+}
+
+class LruCache<K, V> {
+  LruCache({int countLimit = 100, int totalCostLimit = 1024 * 1024 * 50})
+      : _countLimit = countLimit,
+        _totalCostLimit = totalCostLimit;
+
+  int get countLimit => _countLimit;
+  int get totalCostLimit => _totalCostLimit;
+
+  set countLimit(int value) {
+    _countLimit = value;
+    _checkLimit();
+  }
+
+  set totalCostLimit(int value) {
+    _totalCostLimit = value;
+    _checkLimit();
+  }
+
+  final Map<K, V> _map = {};
+  final Map<K, int> _costMap = {};
+  final List<K> _keys = [];
+  int _totalCost = 0;
+  int _countLimit;
+  int _totalCostLimit;
+
+  Future<V> putIfAbsent(K key, FutureOr<(V, int)> Function() ifAbsent) async {
+    if (_map.containsKey(key)) {
+      _keys.remove(key);
+      _keys.add(key);
+      return _map[key]!;
+    }
+
+    final (value, cost) = await ifAbsent();
+    _map[key] = value;
+    _costMap[key] = cost;
+    _keys.add(key);
+    _checkLimit();
+    return value;
+  }
+
+  void clear() {
+    _map.clear();
+  }
+
+  void evict(K key) {
+    _map.remove(key);
+    _costMap.remove(key);
+    _keys.remove(key);
+  }
+
+  void _checkLimit() {
+    while (_map.length > countLimit || _totalCost > totalCostLimit) {
+      final key = _keys.removeAt(0);
+      final cost = _costMap.remove(key) ?? 0;
+      _map.remove(key);
+      _totalCost -= cost;
+    }
   }
 }
 

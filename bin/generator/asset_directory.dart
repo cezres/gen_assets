@@ -27,6 +27,9 @@ class AssetDirectory {
     for (final AssetDirectory directory in directories) {
       types.addAll(directory.types);
     }
+    if (types.contains(AssetType.json)) {
+      types.add(AssetType.unknown);
+    }
     return types;
   }
 

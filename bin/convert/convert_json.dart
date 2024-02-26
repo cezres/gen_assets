@@ -10,9 +10,10 @@ void removeAllJsonWhitespace() {
       .where(_isJsonFileToConvert)
       .toList()
       .fold(
-          0,
-          (previousValue, element) =>
-              previousValue + _removeJsonWhitespace(element));
+        0,
+        (previousValue, element) =>
+            previousValue + _removeJsonWhitespace(element),
+      );
   print('Total reduction of ${(length / 1024 / 1024).toStringAsFixed(4)} MB');
 }
 

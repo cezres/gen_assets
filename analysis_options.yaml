@@ -3,3 +3,7 @@ include: package:lints/recommended.yaml
 analyzer:
   exclude:
     - output/assets.g.dart
+    - template/unknown_asset.dart
+    - template/json_asset.dart
+    - template/lru_assets_cache.dart
+
