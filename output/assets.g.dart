@@ -98,7 +98,7 @@ final class JsonAsset extends UnknownAsset {
   }
 
   Future<T> parse<T>(
-      Future<T> Function(Map<String, dynamic> json) parser) async {
+      FutureOr<T> Function(Map<String, dynamic> json) parser) async {
     final data = await load();
     if (backgroud) {
       return compute(

@@ -65,7 +65,7 @@ Assets.images.download.path; // 'assets/images/download.png'
 Assets.images.download.image(); // Image.asset('assets/images/download.png')
 Assets.fonts.robotoRegular.name; // 'Roboto-Regular'
 Assets.json.test1.json(); // Future<Map<String, dynamic>>
-Assets.json.test1.parse((json) => json); // Future<T>
+Assets.json.test1.parse(T.fromJson); // Future<T>
 Assets.lottie.test1.lottie(); // LottieBuilder.asset('assets/lottie/test1.json')
 ```
 
